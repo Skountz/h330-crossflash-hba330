@@ -1,69 +1,59 @@
-# Files to download:
-
-Firmware for H330 Adapter or your specific card.
-Here for H330 Adapter (should be the same for r730xd/r740xd):
-
-    https://www.dell.com/support/home/fr-fr/drivers/driversdetails?driverid=nknvc&oscode=w12r2&productcode=poweredge-r740xd
+# To download:
 
 FreeDos 1.4 or newer (Full USB)
 
     https://www.freedos.org/download/
 
-MegaCli.exe and Megarec.exe (or Megarec3.exe in some tutorial).
-MegaCli.exe is from "boot/LSI/FW/MegaCli.exe".
-Megarec.exe is just the file "boot/LSI/FW/Recover/Megacli.exe" renamed like this, nothing more complicated (could not find this info online!).
 
-    https://www.broadcom.com/support/knowledgebase/1211161499804/lsi-pre-boot-usb-tool-download
+Then you can follow the procedure at [PROCEDURE.md](PROCEDURE.md)
 
-sas3flsh:
 
-    https://docs.broadcom.com/docs/Installer_P16_for_MSDOS_and_Windows.zip
 
-smc3108.rom (taken from Abacus Electric, maybe better (official) source could be found:
+## Sources of this repository content:
 
-    https://ftp.abacus.cz/support/FW/STORAGE/SUPERMICRO/FIRMWARE_SM_3108/4.270.00-3972/
+### Firmware to flash to HBA330 (should be the same for r730xd/r740xd)
 
-sbrempty.bin:
-```
-% od -t x1 sbrempty.bin
-0000000    00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00
-*
-0000220    00  00  00  00  00  00  00  00  ff  ff  ff  ff  ff  ff  ff  ff
-0000240    ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff
-*
-0000400
-```
+    For H330 Adapter:
 
-Just dd freedos to the key and mount the key (image has enough left space to hold the files we will copy).
-Then copy the files from "to_put_on_key"
+        https://www.dell.com/support/home/fr-fr/drivers/driversdetails?driverid=nknvc&oscode=w12r2&productcode=poweredge-r740xd
 
-Then boot into FreeDos and follow this procedure.
+    For H330 Mini:
 
-# PROCEDURE
+        https://www.dell.com/support/home/fr-fr/drivers/driversdetails?driverid=124x2&oscode=wst14&productcode=poweredge-r740xd
 
-## 1. SAVE INFO (SAS Address and Serial number)
-megacli -adpallinfo -a0 > h330info.txt
 
-## 2. Optional: Flash temp ROM
-megacli -adpfwflash -f smc3108.rom noverchk -a0
-reboot
 
-(wait 3-5 min until "No adapter")
+### Tools from Broadcom
 
-## 3. Erase flash
-megarec -writesbr 0 sbrempty.bin
-megarec -cleanflash 0
+    MegaCli.exe and Megarec.exe (or Megarec3.exe in some tutorial):
 
-reboot
+        https://www.broadcom.com/support/knowledgebase/1211161499804/lsi-pre-boot-usb-tool-download
 
-## 4. Verify erased
-sas3flsh -list
+    Notes:
+        - MegaCli.exe is from "boot/LSI/FW/MegaCli.exe".  
+        - Megarec.exe is just the file "boot/LSI/FW/Recover/Megacli.exe" renamed like this, nothing more complicated (could not find this info online!).
 
-## 5. Flash HBA330 from Dell website for H330 Adapter or your specific model
-sas3flsh -o -f SAS_HBA330_ADP_SF.fw -b mptx64-sas3-sb.rom
+<!-- -->
 
-## 6. Program SAS address and Serial number (from file save at step 1)
-sas3flsh -c 0 -o -sasadd YOUR_16_CHAR_ADDRESS -tracer SERIAL_ID
+    sas3flsh:
 
-## 7. Verify
-sas3flsh -listall
+        https://docs.broadcom.com/docs/Installer_P16_for_MSDOS_and_Windows.zip
+
+
+
+### Other files
+
+    smc3108.rom (taken from Abacus Electric, maybe better (official) source could be found:
+
+        https://ftp.abacus.cz/support/FW/STORAGE/SUPERMICRO/FIRMWARE_SM_3108/4.270.00-3972/
+
+    sbrempty.bin:
+
+        % od -t x1 sbrempty.bin
+        0000000    00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00
+        *
+        0000220    00  00  00  00  00  00  00  00  ff  ff  ff  ff  ff  ff  ff  ff
+        0000240    ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff  ff
+        *
+        0000400
+
